@@ -39,6 +39,10 @@ public:
 		_word_inputs.resize(sent_length);
 		_word_window.resize(sent_length);
 		_hidden.resize(sent_length);
+
+		_avg_pooling.setParam(sent_length);
+		_max_pooling.setParam(sent_length);
+		_min_pooling.setParam(sent_length);
 	}
 
 	inline void clear(){

@@ -31,11 +31,11 @@ struct HyperParams{
 public:
 	HyperParams(){
 		bAssigned = false;
-    batch = 1;
 	}
 
 public:
 	void setRequared(Options& opt){
+    batch = opt.batchSize;
 		nnRegular = opt.regParameter;
 		adaAlpha = opt.adaAlpha;
 		adaEps = opt.adaEps;
