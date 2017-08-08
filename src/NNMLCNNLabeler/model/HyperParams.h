@@ -17,9 +17,11 @@ struct HyperParams {
     dtype adaEps; // for optimization
 
     int hiddenSize;
+    int cnnLayerSize;
     int wordContext;
     int wordWindow;
-    int windowOutput;
+    int windowOutput_layer1;
+    int windowOutput_layer2;
     dtype dropProb;
 
 
@@ -32,6 +34,7 @@ struct HyperParams {
     HyperParams() {
         bAssigned = false;
         batch = 1;
+        cnnLayerSize = 1;
     }
 
   public:
@@ -43,6 +46,11 @@ struct HyperParams {
         wordContext = opt.wordcontext;
         dropProb = opt.dropProb;
         batch = opt.batchSize;
+
+        if (opt.cnnLayerSize < 1)
+            cnnLayerSize = 1;
+        else
+            cnnLayerSize = opt.cnnLayerSize;
 
         bAssigned = true;
     }
@@ -64,7 +72,7 @@ struct HyperParams {
         os << hiddenSize << std::endl;
         os << wordContext << std::endl;
         os << wordWindow << std::endl;
-        os << windowOutput << std::endl;
+        os << windowOutput_layer1 << std::endl;
         os << dropProb << std::endl;
 
 
@@ -81,7 +89,7 @@ struct HyperParams {
         is >> hiddenSize;
         is >> wordContext;
         is >> wordWindow;
-        is >> windowOutput;
+        is >> windowOutput_layer1;
         is >> dropProb;
 
 

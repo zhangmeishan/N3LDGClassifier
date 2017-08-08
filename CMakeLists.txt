@@ -54,7 +54,7 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 else()
     SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -funroll-loops -w -std=c++11 -Ofast -march=native" )
 endif()
-add_definitions( -DUSE_FLOAT )
+#add_definitions( -DUSE_FLOAT )
 
 include_directories(${EIGEN3_DIR})
 include_directories(${N3LDG_DIR})

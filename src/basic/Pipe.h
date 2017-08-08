@@ -17,105 +17,105 @@ using namespace std;
 //#define MAX_BUFFER_SIZE 256
 
 class Pipe {
-public:
-  Pipe() {
-    m_jstReader = new InstanceReader();
-    m_jstWriter = new InstanceWriter();
-	max_sentense_size = 256;
-  }
-
-  ~Pipe(void) {
-    if (m_jstReader)
-      delete m_jstReader;
-    if (m_jstWriter)
-      delete m_jstWriter;
-  }
-
-  int initInputFile(const char *filename) {
-    if (0 != m_jstReader->startReading(filename))
-      return -1;
-    return 0;
-  }
-
-  void uninitInputFile() {
-    if (m_jstWriter)
-      m_jstReader->finishReading();
-  }
-
-  int initOutputFile(const char *filename) {
-    if (0 != m_jstWriter->startWriting(filename))
-      return -1;
-    return 0;
-  }
-
-  void uninitOutputFile() {
-    if (m_jstWriter)
-      m_jstWriter->finishWriting();
-  }
-
-  int outputAllInstances(const string& m_strOutFile, const vector<Instance>& vecInstances) {
-
-    initOutputFile(m_strOutFile.c_str());
-    static int instNum;
-    instNum = vecInstances.size();
-    for (int idx = 0; idx < instNum; idx++) {
-      if (0 != m_jstWriter->write(&(vecInstances[idx])))
-        return -1;
+  public:
+    Pipe() {
+        m_jstReader = new InstanceReader();
+        m_jstWriter = new InstanceWriter();
+        max_sentense_size = 256;
     }
 
-    uninitOutputFile();
-    return 0;
-  }
+    ~Pipe(void) {
+        if (m_jstReader)
+            delete m_jstReader;
+        if (m_jstWriter)
+            delete m_jstWriter;
+    }
 
-  int outputSingleInstance(const Instance& inst) {
+    int initInputFile(const char *filename) {
+        if (0 != m_jstReader->startReading(filename))
+            return -1;
+        return 0;
+    }
 
-    if (0 != m_jstWriter->write(&inst))
-      return -1;
-    return 0;
-  }
+    void uninitInputFile() {
+        if (m_jstWriter)
+            m_jstReader->finishReading();
+    }
 
-  Instance* nextInstance() {
-    Instance *pInstance = m_jstReader->getNext();
-    if (!pInstance)
-      return 0;
+    int initOutputFile(const char *filename) {
+        if (0 != m_jstWriter->startWriting(filename))
+            return -1;
+        return 0;
+    }
 
-    return pInstance;
-  }
+    void uninitOutputFile() {
+        if (m_jstWriter)
+            m_jstWriter->finishWriting();
+    }
 
-  void readInstances(const string& m_strInFile, vector<Instance>& vecInstances, int maxInstance = -1) {
-    vecInstances.clear();
-    initInputFile(m_strInFile.c_str());
+    int outputAllInstances(const string& m_strOutFile, const vector<Instance>& vecInstances) {
 
-    Instance *pInstance = nextInstance();
-    int numInstance = 0;
-
-    while (pInstance) {
-
-        Instance trainInstance;
-        trainInstance.copyValuesFrom(*pInstance);
-        vecInstances.push_back(trainInstance);
-        numInstance++;
-
-        if (numInstance == maxInstance) {
-          break;
+        initOutputFile(m_strOutFile.c_str());
+        static int instNum;
+        instNum = vecInstances.size();
+        for (int idx = 0; idx < instNum; idx++) {
+            if (0 != m_jstWriter->write(&(vecInstances[idx])))
+                return -1;
         }
 
-      pInstance = nextInstance();
-
+        uninitOutputFile();
+        return 0;
     }
 
-    uninitInputFile();
+    int outputSingleInstance(const Instance& inst) {
 
-    cout << endl;
-    cout << "instance num: " << numInstance << endl;
-  }
+        if (0 != m_jstWriter->write(&inst))
+            return -1;
+        return 0;
+    }
 
-public:
-	int max_sentense_size;
+    Instance* nextInstance() {
+        Instance *pInstance = m_jstReader->getNext();
+        if (!pInstance)
+            return 0;
 
-protected:
-  Reader *m_jstReader;
-  Writer *m_jstWriter;
+        return pInstance;
+    }
+
+    void readInstances(const string& m_strInFile, vector<Instance>& vecInstances, int maxInstance = -1) {
+        vecInstances.clear();
+        initInputFile(m_strInFile.c_str());
+
+        Instance *pInstance = nextInstance();
+        int numInstance = 0;
+
+        while (pInstance) {
+
+            Instance trainInstance;
+            trainInstance.copyValuesFrom(*pInstance);
+            vecInstances.push_back(trainInstance);
+            numInstance++;
+
+            if (numInstance == maxInstance) {
+                break;
+            }
+
+            pInstance = nextInstance();
+
+        }
+
+        uninitInputFile();
+
+        cout << endl;
+        cout << "instance num: " << numInstance << endl;
+    }
+
+  public:
+    int max_sentense_size;
+
+  protected:
+    Reader *m_jstReader;
+    Writer *m_jstWriter;
 
 };
 

@@ -1,0 +1,11 @@
+
+outBest = .debug
+maxInstance = 100
+maxIter = 100
+hiddenSize = 50
+verboseIter = 10
+#dropProb = 0.2
+wordEmbFineTune = true
+wordcontext = 2
+batchSize = 1
+#wordFile = E:\corpus_movies\emb_sample.txt

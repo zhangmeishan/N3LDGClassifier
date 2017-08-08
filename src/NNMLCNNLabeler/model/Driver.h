@@ -54,7 +54,7 @@ class Driver {
         _builders.resize(_hyperparams.batch);
 
         for (int idx = 0; idx < _hyperparams.batch; idx++) {
-            _builders[idx].createNodes(GraphBuilder::max_sentence_length);
+            _builders[idx].createNodes(GraphBuilder::max_sentence_length, _hyperparams.cnnLayerSize);
             _builders[idx].initial(_modelparams, _hyperparams);
         }
 
@@ -79,7 +79,7 @@ class Driver {
         _builders.resize(_hyperparams.batch);
 
         for (int idx = 0; idx < _hyperparams.batch; idx++) {
-            _builders[idx].createNodes(GraphBuilder::max_sentence_length);
+            _builders[idx].createNodes(GraphBuilder::max_sentence_length, _hyperparams.cnnLayerSize);
             _builders[idx].initial(_modelparams, _hyperparams);
         }
 
