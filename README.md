@@ -9,7 +9,7 @@ A simple guide for EGN3LDG: text classification
 ## Run:
 (1) cd build;    
 (2) rm -rf *;    
-(3) cmake ..  (if MKL is installed, check "set(MKL_ROOT /opt/intel/mkl)", and run cmake .. -DMKL=True);    
+(3) cmake ..  (if MKL is installed, check "[set(MKL_ROOT /opt/intel/mkl)](CMakeLists.txt)", and run cmake .. -DMKL=True);    
 (4) make;    
 
 
