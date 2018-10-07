@@ -2,7 +2,6 @@
 #define SRC_NNCNNLabeler_H_
 
 
-#include "N3LDG.h"
 #include "Driver.h"
 #include "Options.h"
 #include "Instance.h"
@@ -14,6 +13,8 @@ using namespace nr;
 using namespace std;
 
 class Classifier {
+
+
   public:
     unordered_map<string, int> m_word_stats;
     unordered_map<string, int> m_feat_stats;
@@ -27,7 +28,7 @@ class Classifier {
 
 
   public:
-    Classifier();
+    Classifier(int memsize);
     virtual ~Classifier();
 
   public:
@@ -42,7 +43,8 @@ class Classifier {
 
   public:
     void train(const string& trainFile, const string& devFile, const string& testFile, const string& modelFile, const string& optionFile);
-    void predict(const vector<Example>& features, vector<string>& outputs);
+    int predict(const Feature& feature, string& output);
+    void predict(const vector<Example>& examples, vector<string>& outputs);
     void test(const string& testFile, const string& outputFile, const string& modelFile);
 
     void writeModelFile(const string& outputModelFile);

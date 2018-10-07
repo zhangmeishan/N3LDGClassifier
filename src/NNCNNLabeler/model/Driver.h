@@ -1,9 +1,9 @@
 /*
-* Driver.h
-*
-*  Created on: Mar 18, 2015
-*      Author: mszhang
-*/
+ * Driver.h
+ *
+ *  Created on: Mar 18, 2015
+ *      Author: mszhang
+ */
 
 #ifndef SRC_Driver_H_
 #define SRC_Driver_H_
@@ -11,11 +11,12 @@
 #include <iostream>
 #include "ComputionGraph.h"
 
+
 //A native neural network classfier using only word embeddings
 
 class Driver {
   public:
-    Driver() {
+    Driver(int memsize) {
 
     }
 
@@ -32,7 +33,6 @@ class Driver {
     Metric _eval;
     CheckGrad _checkgrad;
     ModelUpdate _ada;  // model update
-
 
 
   public:
@@ -55,7 +55,7 @@ class Driver {
 
         for (int idx = 0; idx < _hyperparams.batch; idx++) {
             _builders[idx].createNodes(GraphBuilder::max_sentence_length);
-            _builders[idx].initial(_modelparams, _hyperparams);
+            _builders[idx].initial(&_cg, _modelparams, _hyperparams);
         }
 
         setUpdateParameters(_hyperparams.nnRegular, _hyperparams.adaAlpha, _hyperparams.adaEps);
@@ -72,7 +72,7 @@ class Driver {
             return;
         }
         _modelparams.exportModelParams(_ada);
-        _modelparams.exportCheckGradParams(_checkgrad);
+        //_modelparams.exportCheckGradParams(_checkgrad);
 
         _hyperparams.print();
 
@@ -80,7 +80,7 @@ class Driver {
 
         for (int idx = 0; idx < _hyperparams.batch; idx++) {
             _builders[idx].createNodes(GraphBuilder::max_sentence_length);
-            _builders[idx].initial(_modelparams, _hyperparams);
+            _builders[idx].initial(&_cg, _modelparams, _hyperparams);
         }
 
         setUpdateParameters(_hyperparams.nnRegular, _hyperparams.adaAlpha, _hyperparams.adaEps);
@@ -88,8 +88,9 @@ class Driver {
 
 
 
-    inline dtype train(const vector<Example>& examples) {
+    inline dtype train(const vector<Example>& examples, int iter) {
         _eval.reset();
+        _cg.clearValue(true);
         int example_num = examples.size();
         if (example_num > _builders.size()) {
             std::cout << "input example number larger than predefined batch number" << std::endl;
@@ -97,19 +98,22 @@ class Driver {
         }
 
         dtype cost = 0.0;
-		_cg.clearValue(true);
+
         for (int count = 0; count < example_num; count++) {
             const Example& example = examples[count];
+
             //forward
-            _builders[count].forward(&_cg, example.m_feature);
+            _builders[count].forward(example.m_feature, true);
 
         }
+
         _cg.compute();
 
         for (int count = 0; count < example_num; count++) {
             const Example& example = examples[count];
             cost += _modelparams.loss.loss(&_builders[count]._neural_output, example.m_label, _eval, example_num);
         }
+
         _cg.backward();
 
         if (_eval.getAccuracy() < 0) {
@@ -119,29 +123,42 @@ class Driver {
         return cost;
     }
 
-    inline void predict(const vector<Feature>& features, vector<int>& results) {
-		results.clear();
-		int num = features.size();
-		if (num > _builders.size()) {
-			std::cout << "input example number is larger than predefined batch number" << std::endl;
-			return;
-		}
-		
-		_cg.clearValue();
-		for (int idx = 0; idx < num; idx++) {
-			_builders[idx].forward(&_cg, features[idx]);
-		}
-		_cg.compute();
+    inline void predict(const Feature& feature, int& result) {
+        _cg.clearValue();
 
-		results.resize(num);
-		for (int idx = 0; idx < num; idx++) {
-			_modelparams.loss.predict(&_builders[idx]._neural_output, results[idx]);
-		}      
+        _builders[0].forward(feature);
+        _cg.compute();
+
+        _modelparams.loss.predict(&_builders[0]._neural_output, result);
+    }
+
+    inline void predict(const vector<Example>& examples, vector<int>& results) {
+        int size = examples.size();
+        int batch = _builders.size();
+        int batchBlock = size / batch + 1;
+        int rest = size % batch;
+        int offset = 0;
+        for (int idx = 0; idx < batchBlock; idx++) {
+            _cg.clearValue(false);
+            int size_y = idx + 1 == batchBlock ? rest : batch;
+            for (int idy = 0; idy < size_y; idy++)
+                _builders[idy].forward(examples[offset + idy].m_feature, false);
+            offset += batch;
+            _cg.compute();
+
+            int re;
+            for (int idy = 0; idy < size_y; idy++) {
+                _modelparams.loss.predict(&_builders[idy]._neural_output, re);
+                results.push_back(re);
+            }
+
+        }
     }
 
     inline dtype cost(const Example& example) {
-        _cg.clearValue();
-        _builders[0].forward(&_cg, example.m_feature);
+        _cg.clearValue(true);
+
+        _builders[0].forward(example.m_feature, true);
         _cg.compute();
 
         dtype cost = _modelparams.loss.cost(&_builders[0]._neural_output, example.m_label, 1);
@@ -152,7 +169,9 @@ class Driver {
 
     void updateModel() {
         //_ada.update();
-        _ada.update(10.0);
+        //_ada.update(5.0);
+        //_ada.update(10);
+        _ada.updateAdam(10);
     }
 
     void checkgrad(const vector<Example>& examples, int iter) {

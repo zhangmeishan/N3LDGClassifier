@@ -54,9 +54,13 @@ if(CMAKE_BUILD_TYPE MATCHES Debug)
 else()
     SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -fPIC -funroll-loops -w -std=c++11 -Ofast -march=native" )
 endif()
+###### If USE_FLOAT is enabled, checkgrad is inaccurate
 #add_definitions( -DUSE_FLOAT )
 
-include_directories(${EIGEN3_DIR})
-include_directories(${N3LDG_DIR})
+
+#include_directories(${EIGEN3_DIR})
+#include_directories(${N3L_DIR})
+include_directories(eigen)
+include_directories(EGN3LDG)
 
 add_subdirectory(src)
