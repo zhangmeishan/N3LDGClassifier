@@ -7,10 +7,10 @@ A simple guide for EGN3LDG: text classification
 * If we add new neural modules in EGN3LDG, should check the module gradients by the clasifier.
  
 ## Run:
-(1) cd build;
-(2) rm -rf *;
-(3) cmake ..  (if MKL is installed, check "set(MKL_ROOT /opt/intel/mkl)", and run cmake .. -DMKL=True);
-(4) make;
+(1) cd build;    
+(2) rm -rf *;    
+(3) cmake ..  (if MKL is installed, check "set(MKL_ROOT /opt/intel/mkl)", and run cmake .. -DMKL=True);    
+(4) make;    
 
 
 If you have any problem, please send an email to mason.zms@gmail.com.
